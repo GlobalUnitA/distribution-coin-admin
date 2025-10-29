@@ -1,0 +1,59 @@
+name: build-and-deploy
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Grant Gradle permission
+        run: chmod +x ./gradlew
+
+      - name: Build
+        run: ./gradlew clean bootJar
+
+      - name: Capture artifact path
+        id: artifact
+        run: echo "JAR_PATH=$(ls -1 build/libs/*-SNAPSHOT.jar | head -n 1)" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: ${{ steps.artifact.outputs.JAR_PATH }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app
+          path: .
+
+      - name: Install ssh client
+        run: sudo apt-get update -y && sudo apt-get install -y openssh-client
+
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "Host target\n  HostName %s\n  User %s\n  Port %s\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no\n" \
+            "${{ secrets.SSH_HOST }}" "${{ secrets.SSH_USER }}" "${{ secrets.SSH_PORT }}" > ~/.ssh/config
+
+      - name: Deploy to EC2
+        run: |
+          scp *.jar target:/tmp/app.jar
+          ssh target "sudo install -o spring -g spring -m 755 /tmp/app.jar ${{ secrets.APP_DIR }}/app.jar && sudo systemctl restart ${{ secrets.SERVICE_NAME }}"
