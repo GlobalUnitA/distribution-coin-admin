@@ -13,6 +13,6 @@ public class HelloController {
 
     @GetMapping("/hello")
     public String hello() {
-        return "Spring Boot is running. ^^";
+        return "Spring Boot is running!!!!!!!";
     }
 }
