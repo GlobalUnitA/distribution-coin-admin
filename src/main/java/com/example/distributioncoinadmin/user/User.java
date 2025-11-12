@@ -5,17 +5,15 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-
 @Entity
 @Table(
         name = "users",
         uniqueConstraints = @UniqueConstraint(name = "uk_users_username", columnNames = "username"),
         indexes = @Index(name = "idx_users_enabled", columnList = "enabled")
 )
-
-
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="username", nullable=false, length=100)
@@ -30,6 +28,15 @@ public class User {
     @Column(name="enabled", nullable=false)
     private boolean enabled = true;
 
+    // ✅ 추가된 부분
+    @Column(
+            name = "use_yn",
+            nullable = false,
+            length = 1,
+            columnDefinition = "CHAR(1) CHECK (use_yn IN ('Y','N'))"
+    )
+    private String useYn = "Y"; // 기본값 Y
+
     @CreationTimestamp
     @Column(name="created_at", nullable=false, columnDefinition = "datetime(6)")
     private LocalDateTime createdAt;
@@ -38,4 +45,7 @@ public class User {
     @Column(name="updated_at", nullable=false, columnDefinition = "datetime(6)")
     private LocalDateTime updatedAt;
 
+    // getter/setter 추가
+    public String getUseYn() { return useYn; }
+    public void setUseYn(String useYn) { this.useYn = useYn; }
 }
