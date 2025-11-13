@@ -85,6 +85,7 @@ replay_pid*
 src/main/resources/application-*.properties
 src/main/resources/application-*.yml
 src/main/resources/application-*.yaml
+src/main/resources/application-prod.properties
 
 # 예시 파일은 추적(원하실 때)
 !src/main/resources/application-example.yml
