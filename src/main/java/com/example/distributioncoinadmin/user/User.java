@@ -28,15 +28,6 @@ public class User {
     @Column(name="enabled", nullable=false)
     private boolean enabled = true;
 
-    // ✅ 추가된 부분
-    @Column(
-            name = "use_yn",
-            nullable = false,
-            length = 1,
-            columnDefinition = "CHAR(1) CHECK (use_yn IN ('Y','N'))"
-    )
-    private String useYn = "Y"; // 기본값 Y
-
     @CreationTimestamp
     @Column(name="created_at", nullable=false, columnDefinition = "datetime(6)")
     private LocalDateTime createdAt;
@@ -44,8 +35,4 @@ public class User {
     @UpdateTimestamp
     @Column(name="updated_at", nullable=false, columnDefinition = "datetime(6)")
     private LocalDateTime updatedAt;
-
-    // getter/setter 추가
-    public String getUseYn() { return useYn; }
-    public void setUseYn(String useYn) { this.useYn = useYn; }
 }
