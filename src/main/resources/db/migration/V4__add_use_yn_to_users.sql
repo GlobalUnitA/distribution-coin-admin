@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN use_yn ENUM('Y','N') NOT NULL DEFAULT 'Y';
