@@ -1,4 +1,5 @@
-package com.example.demo.config;
+//\src\main\java\com\example\distributioncoinadmin\security\SecurityConfig.java
+package com.example.distributioncoinadmin.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,15 +16,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable()) // 테스트용, 나중에 필요하면 조정
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/login", "/css/**", "/js/**", "/is/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable()) // 기본 로그인 폼 비활성화
+                .formLogin(form -> form
+                        .loginPage("/login")              // LoginController 가 반환하는 뷰
+                        .loginProcessingUrl("/login")     // form action="/login" 이랑 맞추기
+                        .defaultSuccessUrl("/hello", true) // 임시 성공 이동 URL
+                        .permitAll()
+                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/logout-success")
+                        .logoutSuccessUrl("/login?logout")
                 );
 
         return http.build();
@@ -31,8 +37,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration
-    ) throws Exception {
+            AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 }
