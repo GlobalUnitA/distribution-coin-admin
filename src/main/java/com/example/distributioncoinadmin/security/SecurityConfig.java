@@ -1,4 +1,3 @@
-//\src\main\java\com\example\distributioncoinadmin\security\SecurityConfig.java
 package com.example.distributioncoinadmin.security;
 
 import org.springframework.context.annotation.Bean;
@@ -24,7 +23,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")              // LoginController 가 반환하는 뷰
                         .loginProcessingUrl("/login")     // form action="/login" 이랑 맞추기
-                        .defaultSuccessUrl("/hello", true) // 임시 성공 이동 URL
+                        .defaultSuccessUrl("/", true) // 임시 성공 이동 URL
                         .permitAll()
                 )
                 .logout(logout -> logout
