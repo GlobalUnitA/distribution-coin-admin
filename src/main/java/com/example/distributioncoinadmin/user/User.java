@@ -35,4 +35,35 @@ public class User {
     @UpdateTimestamp
     @Column(name="updated_at", nullable=false, columnDefinition = "datetime(6)")
     private LocalDateTime updatedAt;
+
+
+    //getter
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 }
+
