@@ -1,8 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Home</title></head>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HOME</title>
+</head>
 <body>
-<h1>Home</h1>
-<p><a th:href="@{/login}">로그인</a></p>
+<h1>HOME</h1>
+
+<p>
+    로그인된 사용자:
+    <span th:text="${username}">username</span>
+</p>
+
+<form th:action="@{/logout}" method="post">
+    <button type="submit">로그아웃</button>
+</form>
+
 </body>
 </html>
