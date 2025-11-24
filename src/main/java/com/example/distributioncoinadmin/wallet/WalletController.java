@@ -1,37 +1,28 @@
-package com.example.distributioncoinadmin.wallet;
-
+import com.example.distributioncoinadmin.wallet.TronAssetService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/wallet")
 public class WalletController {
-    private final TronAssetService  tronAssetService;
 
-    public WalletController(TronAssetService tronAssetService) {
+    private final TronAssetService tronAssetService;
+    private final String mainAddress;
+
+    public WalletController(TronAssetService tronAssetService,
+                            @Value("${tron.wallet.main-address}") String mainAddress) {
         this.tronAssetService = tronAssetService;
-    }
-
-    @GetMapping("/net-assets")
-    public Map<String, Object> getNetAssets(@RequestParam String address) {
-        double total = tronAssetService.getTotalAssets(address);
-        return Map.of(
-                "address", address,
-                "netAddetsUsd", total
-        );
+        this.mainAddress = mainAddress;
     }
 
     @GetMapping("/usdt-balance")
-    public Map<String, Object> getUsdtBalance(@RequestParam String address) {
-        double usdt = tronAssetService.getUsdtBalance(address);
+    public Map<String, Object> getUsdtBalance() {
+        double usdt = tronAssetService.getUsdtBalance(mainAddress);
         return Map.of(
-                "address", address,
                 "usdtAvailable", usdt
         );
     }
-
 }
