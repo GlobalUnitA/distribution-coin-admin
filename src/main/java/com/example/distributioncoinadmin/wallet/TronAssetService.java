@@ -22,31 +22,15 @@ public class TronAssetService {
             return Collections.emptyList();
         }
 
-        Object data = response.get("data");   // ★ 여기!
+        Object data = response.get("data");
         if (!(data instanceof List<?> list)) {
             return Collections.emptyList();
         }
 
-        // unchecked 캐스팅
         //noinspection unchecked
         return (List<Map<String, Object>>) list;
     }
 
-    // 전체 USD 자산
-    public double getTotalAssets(String wallet) {
-        List<Map<String, Object>> tokens = fetchTokens(wallet);
-
-        double total = 0.0;
-        for (Map<String, Object> token : tokens) {
-            Object amountInUsdObj = token.get("amountInUsd");
-            if (amountInUsdObj == null) continue;
-
-            total += Double.parseDouble(amountInUsdObj.toString());
-        }
-        return total;
-    }
-
-    // USDT 잔액
     public double getUsdtBalance(String wallet) {
         List<Map<String, Object>> tokens = fetchTokens(wallet);
 
@@ -55,13 +39,11 @@ public class TronAssetService {
             if (!"USDT".equalsIgnoreCase(abbr)) {
                 continue;
             }
-
             Object amountObj = token.get("amount");
             if (amountObj == null) return 0.0;
 
             return Double.parseDouble(amountObj.toString());
         }
-
         return 0.0;
     }
 }

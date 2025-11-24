@@ -23,8 +23,6 @@ public class WalletController {
     @GetMapping("/usdt-balance")
     public Map<String, Object> getUsdtBalance() {
         double usdt = tronAssetService.getUsdtBalance(mainAddress);
-        return Map.of(
-                "usdtAvailable", usdt
-        );
+        return Map.of("usdtAvailable", usdt);
     }
 }
