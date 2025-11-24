@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>USDT 잔액 테스트</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .row { margin-bottom: 12px; }
+        .amount-input {
+            width: 340px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+        #availableText {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>USDT 잔액 확인</h2>
+
+<div class="row">
+    <label>지갑 주소</label><br>
+    <input id="walletAddress" class="amount-input"
+           value="TTfMQNAfACyAjzVX5qkXwbmmonS5pTX9XH">
+    <button class="btn" onclick="loadBalance()">잔액 불러오기</button>
+</div>
+
+<p id="availableText">사용가능 수량: -</p>
+
+<script>
+    async function loadBalance() {
+        const address = document.getElementById('walletAddress').value.trim();
+        if (!address) {
+            alert('지갑 주소를 입력하세요.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/wallet/usdt-balance?address=' + encodeURIComponent(address));
+            if (!res.ok) {
+                throw new Error('API 오류: ' + res.status);
+            }
+
+            const data = await res.json();
+            const usdt = Number(data.usdtAvailable || 0);
+
+            document.getElementById('availableText').innerText =
+                '사용가능 수량: ' + usdt.toFixed(6) + ' USDT';
+
+        } catch (e) {
+            console.error(e);
+            alert('잔액 조회 중 오류가 발생했습니다.');
+        }
+    }
+
+    // 페이지 로딩 후 자동 조회
+    window.addEventListener('DOMContentLoaded', loadBalance);
+</script>
+
+</body>
+</html>
