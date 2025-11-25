@@ -1,0 +1,228 @@
+<!-- templates/fund/withdraw-select.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>자금관리 > 출금 > 코인 선택</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .layout {
+            display: flex;
+            min-height: 100vh;
+            font-family: "Noto Sans KR", sans-serif;
+        }
+
+        .content {
+            flex: 1;
+            padding: 32px 40px;
+            background: #f7f8fa;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .withdraw-panel {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .withdraw-form {
+            max-width: 860px;
+        }
+
+        .form-row {
+            margin-bottom: 18px;
+        }
+
+        .form-row-inline {
+            display: flex;
+            gap: 16px;
+        }
+
+        .form-field {
+            flex: 1;
+        }
+
+        .form-row label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border-radius: 4px;
+            border: 1px solid #d0d4dc;
+            font-size: 14px;
+            background-color: #fff;
+        }
+
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-with-unit input {
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+        }
+
+        .input-with-unit .unit {
+            padding: 0 12px;
+            border-radius: 0 4px 4px 0;
+            border: 1px solid #d0d4dc;
+            border-left: none;
+            background: #f2f3f7;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .help-text {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .form-actions {
+            margin-top: 28px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            min-width: 200px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            background: #111827;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- 공통 사이드바 include -->
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <main class="content">
+        <div class="page-header">
+            <h1>출금</h1>
+            <div class="breadcrumb">자금관리 &gt; 출금 &gt; 코인 선택</div>
+        </div>
+
+        <section class="withdraw-panel">
+            <form class="withdraw-form"
+                  th:action="@{/fund/withdraw}"
+                  method="post">
+
+                <!-- 코인 선택 -->
+                <div class="form-row">
+                    <label for="coin">코인 선택</label>
+                    <select id="coin" name="coin">
+                        <option value="USDT" selected>USDT</option>
+                        <!-- 다른 코인 필요 시 추가 -->
+                    </select>
+                </div>
+
+                <!-- 네트워크 선택 -->
+                <div class="form-row">
+                    <label for="network">네트워크 선택</label>
+                    <select id="network" name="network">
+                        <option value="BEP20" selected>BEP20 (Binance Smart Chain)</option>
+                        <!-- TRC20, ERC20 등 필요 시 추가 -->
+                    </select>
+                </div>
+
+                <!-- 출금주소 + 메모 -->
+                <div class="form-row form-row-inline">
+                    <div class="form-field">
+                        <label for="withdrawAddress">출금주소</label>
+                        <input type="text"
+                               id="withdrawAddress"
+                               name="withdrawAddress"
+                               placeholder="상대방 지갑 주소를 입력하세요">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="memo">메모</label>
+                        <input type="text"
+                               id="memo"
+                               name="memo"
+                               placeholder="예: 홍길동 지갑">
+                    </div>
+                </div>
+
+                <!-- 출금수량 -->
+                <div class="form-row">
+                    <label for="amount">출금수량</label>
+                    <div class="input-with-unit">
+                        <input type="number"
+                               id="amount"
+                               name="amount"
+                               step="0.00000001"
+                               min="0"
+                               placeholder="0.0">
+                        <span class="unit">USDT</span>
+                    </div>
+                    <div class="help-text">
+                        사용가능 수량:
+                        <span th:text="${availableAmount}">850</span>
+                        USDT
+                    </div>
+                </div>
+
+                <!-- 네트워크 비용 -->
+                <div class="form-row">
+                    <label for="networkFee">네트워크 비용</label>
+                    <div class="input-with-unit">
+                        <input type="number"
+                               id="networkFee"
+                               name="networkFee"
+                               step="0.00000001"
+                               min="0"
+                               th:value="${networkFee}"
+                               placeholder="0.0">
+                        <span class="unit">USDT</span>
+                    </div>
+                    <div class="help-text">
+                        네트워크 비용은 출금 시 자동 차감됩니다.
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">출금하기</button>
+                </div>
+
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>
