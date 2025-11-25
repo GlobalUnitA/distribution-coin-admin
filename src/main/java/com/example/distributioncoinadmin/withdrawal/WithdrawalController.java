@@ -1,11 +1,12 @@
+// src/main/java/com/example/distributioncoinadmin/withdrawal/WithdrawalController.java
 package com.example.distributioncoinadmin.withdrawal;
 
 import com.example.distributioncoinadmin.wallet.TronAssetService;
-import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.ui.Model;
 
 @Controller
 @RequestMapping("/withdrawal")
@@ -19,21 +20,23 @@ public class WithdrawalController {
             TronAssetService tronAssetService,
             @Value("${tron.wallet.main-address}") String mainAddress,
             @Value("${withdrawal.usdt-network-fee:10}") double defaultNetworkFee // 없으면 10
-    ){
+    ) {
         this.tronAssetService = tronAssetService;
         this.mainAddress = mainAddress;
         this.defaultNetworkFee = defaultNetworkFee;
     }
 
+    // 출금 코인 선택 화면
     @GetMapping("/select")
     public String showWithdrawSelect(Model model) {
 
-        //실제 지갑 USDT 사용 가능 수량
+        // 실제 지갑 USDT 사용가능 수량
         double availableUsdt = tronAssetService.getUsdtBalance(mainAddress);
 
-        model.addAttribute("availableUsdt", availableUsdt);
-        model.addAttribute("mainAddress", mainAddress);
+        model.addAttribute("availableAmount", availableUsdt);
+        model.addAttribute("networkFee", defaultNetworkFee);
 
+        // -> templates/withdrawal/select.html
         return "withdrawal/select";
     }
 }
