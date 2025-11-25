@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ui.Model;
 
 @Controller
-@RequestMapping("/withdrawal");
+@RequestMapping("/withdrawal")
 public class WithdrawalController {
 
     private final TronAssetService tronAssetService;
