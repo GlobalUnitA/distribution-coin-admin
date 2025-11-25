@@ -1,4 +1,3 @@
-// src/main/java/com/example/distributioncoinadmin/withdrawal/WithdrawalController.java
 package com.example.distributioncoinadmin.withdrawal;
 
 import com.example.distributioncoinadmin.wallet.TronAssetService;
@@ -27,7 +26,7 @@ public class WithdrawalController {
     }
 
     // 출금 코인 선택 화면
-    @GetMapping("/select")
+    @GetMapping({"", "/"})
     public String showWithdrawSelect(Model model) {
 
         // 실제 지갑 USDT 사용가능 수량
