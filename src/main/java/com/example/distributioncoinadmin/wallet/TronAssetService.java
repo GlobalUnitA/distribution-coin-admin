@@ -72,34 +72,41 @@ public class TronAssetService {
                 continue;
             }
 
-            // balance는 정수(소수점 없는) 문자열, token_decimal 만큼 나눠야 함
-            String balanceStr = String.valueOf(token.get("balance"));        // 예: "641492374"
-            Object decObj = token.get("token_decimal");                      // 예: 6
+            String balanceStr = String.valueOf(token.get("balance")); // 예: "702.263524" 또는 "702263524"
+            Object decObj = token.get("token_decimal");
             int decimals = 0;
             if (decObj != null) {
                 try {
                     decimals = Integer.parseInt(decObj.toString());
-                } catch (NumberFormatException e) {
-                    log.warn("token_decimal 파싱 실패. value={}", decObj);
-                }
+                } catch (NumberFormatException ignored) { }
             }
 
             try {
                 BigDecimal raw = new BigDecimal(balanceStr);
-                BigDecimal divisor = BigDecimal.TEN.pow(decimals);
-                BigDecimal value = divisor.signum() == 0
-                        ? raw
-                        : raw.divide(divisor, 6, RoundingMode.DOWN); // 소수 6자리까지
-                return value.doubleValue();
+
+                // balance가 이미 소수(702.263524) 형태라면 그대로 사용
+                if (balanceStr.contains(".")) {
+                    return raw.setScale(6, RoundingMode.DOWN).doubleValue();
+                }
+
+                // balance가 정수(702263524) 형태라면 10^decimals 로 나눔
+                if (decimals > 0) {
+                    BigDecimal divisor = BigDecimal.TEN.pow(decimals);
+                    BigDecimal value = raw.divide(divisor, 6, RoundingMode.DOWN);
+                    return value.doubleValue();
+                }
+
+                // 소수점도 없고 decimals 도 0이면 그대로 반환
+                return raw.doubleValue();
+
             } catch (NumberFormatException e) {
-                log.error("USDT balance 파싱 실패. value=" + balanceStr, e);
                 return 0.0;
             }
         }
 
-        log.info("USDT 토큰을 찾지 못했습니다. wallet={}", wallet);
         return 0.0;
     }
+
 
     // 필요하면 총 자산 USD도 같이 쓸 수 있게 남겨둠
     public double getTotalAssetsUsd(String wallet) {
