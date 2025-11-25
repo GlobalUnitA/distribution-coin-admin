@@ -25,4 +25,9 @@ public class WalletController {
         double usdt = tronAssetService.getUsdtBalance(mainAddress);
         return Map.of("usdtAvailable", usdt);
     }
+
+    @GetMapping("/usdt-balance-test")
+    public String usdtBalanceTest() {
+        return "wallet controller ok";
+    }
 }
