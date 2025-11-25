@@ -16,20 +16,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
+                // API(/api/**)는 CSRF 검사 제외
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**"
+                                "/images/**",
+                                "/api/wallet/**"   // ★ 지갑 API는 로그인 없이 허용
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")      // GET /login 은 컨트롤러가 처리
-                        // loginProcessingUrl 은 기본값(/login, POST) 사용
-                        // defaultSuccessUrl 은 기본값(요청했던 URL 또는 /) 사용
+                        .loginPage("/login")
                         .permitAll()
                 )
                 .logout(logout -> logout
