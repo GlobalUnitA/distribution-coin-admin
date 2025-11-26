@@ -6,6 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/withdrawal")
@@ -37,5 +41,14 @@ public class WithdrawalController {
 
         // -> templates/withdrawal/select.html
         return "withdrawal/select";
+    }
+
+    @GetMapping("/usdt-balance")
+    @ResponseBody
+    public Map<String, Object> getUsdtBalanceAjax(){
+        double availableUsdt = tronAssetService.getUsdtBalance(mainAddress);
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("availableAmount", availableUsdt);
+        return resp;
     }
 }

@@ -232,7 +232,7 @@
                     </div>
                     <div class="help-text">
                         사용가능 수량:
-                        <span th:text="${availableAmount}">850</span>
+                        <span id="availableAmount" th:text="${availableAmount}">850</span>
                         USDT
                     </div>
                 </div>
@@ -264,5 +264,34 @@
         </section>
     </main>
 </div>
+
+<script>
+    async function refreshUsdtBalance(){
+        try {
+            const res = await fetch('/withdrawal/usdt-balance');
+            if(!res.ok){
+                console.error('usdt-balance 요청 실패!', res.status);
+                return;
+            }
+
+            const data = await res.json();
+            const el = document.getElementById('availableAmount');
+
+            if(el && typeof data.availableAmount === 'number'){
+                //표시 자릿수는 필요에 따라 조정
+                el.textContext = data.availableAmount.toFixed(6);
+            }
+        } catch(e) {
+            console.error('usdt-balance 요청 에러!', e);
+        }
+    }
+
+    //페이지 로딩시 한 번
+    refreshUsdtBalance();
+
+    //이후 5촘다 갱신
+    setInterval(refreshUsdtBalance, 5000);
+</script>
+
 </body>
 </html>
