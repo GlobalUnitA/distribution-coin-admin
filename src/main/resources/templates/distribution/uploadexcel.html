@@ -1,0 +1,160 @@
+<!-- templates/uploadexcel.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>USDT 분배하기</title>
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-placeholder {
+            color: #888;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- 공통 사이드바 include -->
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="content">
+
+        <!-- 상단 제목 영역 -->
+        <div class="page-header">
+            <h1 class="page-title">분배하기</h1>
+
+            <!-- 출금내역 버튼 (우측 상단) -->
+            <div class="page-actions">
+                <a th:href="@{/fund/withdraw/history}" class="btn btn-secondary">
+                    출금내역
+                </a>
+            </div>
+        </div>
+
+        <!-- 분배 설정 폼 -->
+        <form th:action="@{/fund/distribute/upload}"
+              method="post"
+              enctype="multipart/form-data"
+              class="distribute-form">
+
+            <!-- 코인 선택 -->
+            <div class="form-row">
+                <label class="form-label">코인선택</label>
+                <select name="coinSymbol" class="form-select">
+                    <option value="USDT" selected>USDT</option>
+                    <!-- 필요 시 다른 코인 추가 -->
+                </select>
+            </div>
+
+            <!-- 네트워크 선택 -->
+            <div class="form-row">
+                <label class="form-label">네트워크 선택</label>
+                <select name="network" class="form-select">
+                    <option value="BEP20">BEP20(Binance Smart Chain)</option>
+                    <option value="TRC20">TRC20(TRON)</option>
+                    <!-- 필요 시 다른 네트워크 추가 -->
+                </select>
+            </div>
+
+            <!-- 파일 업로드 영역 -->
+            <div class="form-row file-row">
+                <label class="form-label">파일업로드</label>
+
+                <div class="file-input-wrapper">
+                    <input type="file"
+                           id="excelFile"
+                           name="file"
+                           class="file-input"
+                           accept=".xlsx,.xls" />
+
+                    <span class="file-placeholder" id="filePlaceholder">
+                        클릭하여 파일 업로드하세요.
+                    </span>
+
+                    <button type="button"
+                            class="btn btn-outline"
+                            id="btnFileClear">
+                        삭제
+                    </button>
+                </div>
+
+                <!-- 파일양식 다운로드 버튼 -->
+                <div class="file-template">
+                    <a th:href="@{/fund/distribute/template}"
+                       class="btn btn-link">
+                        파일양식 다운로드
+                    </a>
+                </div>
+            </div>
+
+            <!-- 안내 문구 -->
+            <div class="guide-box">
+                <p>1. 입력란을 클릭하여, 분배할 엑셀을 업로드합니다.</p>
+                <p>2. 엑셀은 “파일양식 다운로드”를 통해 관리자가 다운로드한 양식에 데이터를 입력합니다.</p>
+            </div>
+
+            <!-- 하단 확인 버튼 -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    확인
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // 파일 선택 시 파일명 표시
+    const fileInput = document.getElementById('excelFile');
+    const placeholder = document.getElementById('filePlaceholder');
+    const btnClear = document.getElementById('btnFileClear');
+
+    if (fileInput && placeholder) {
+        fileInput.addEventListener('change', function () {
+            if (this.files && this.files.length > 0) {
+                placeholder.textContent = this.files[0].name;
+            } else {
+                placeholder.textContent = '클릭하여 파일 업로드하세요.';
+            }
+        });
+    }
+
+    // 삭제 버튼: 파일 선택 초기화
+    if (btnClear && fileInput && placeholder) {
+        btnClear.addEventListener('click', function () {
+            fileInput.value = '';
+            placeholder.textContent = '클릭하여 파일 업로드하세요.';
+        });
+    }
+</script>
+
+</body>
+</html>
