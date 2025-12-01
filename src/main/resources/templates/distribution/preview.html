@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>USDT 분배 미리보기</title>
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- 사이드바 -->
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <!-- 메인 영역 -->
+    <div class="content">
+        <h1>분배 미리보기</h1>
+
+        <!-- 상단 요약 박스 -->
+        <div class="summary-box">
+            <p>네트워크: <span th:text="${networkName}">BEP20</span></p>
+            <p>사용가능 수량: <span th:text="${available}">0</span></p>
+            <p>출금수량 합계: <span th:text="${totalAmount}">0</span></p>
+            <p>GAS 비용: <span th:text="${gasFee}">0</span></p>
+        </div>
+
+        <!-- 분배 테이블 -->
+        <table border="1" cellspacing="0" cellpadding="4">
+            <thead>
+            <tr>
+                <th>NO.</th>
+                <th>이름</th>
+                <th>USDT 지갑주소</th>
+                <th>USDT 수량</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${rows}">
+                <td th:text="${row.no}">1</td>
+                <td th:text="${row.name}">홍길동</td>
+                <td th:text="${row.walletAddress}">0x...</td>
+                <td th:text="${row.amount}">0</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <form th:action="@{/distribution/upload}" method="post">
+            <button type="submit">분배 실행</button>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>
