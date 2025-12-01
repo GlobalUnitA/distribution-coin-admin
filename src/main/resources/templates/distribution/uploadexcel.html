@@ -79,14 +79,14 @@
 
             <!-- 출금내역 버튼 (우측 상단) -->
             <div class="page-actions">
-                <a th:href="@{/fund/withdraw/history}" class="btn btn-secondary">
+                <a th:href="@{/withdrawal/history}" class="btn btn-secondary">
                     출금내역
                 </a>
             </div>
         </div>
 
         <!-- 분배 설정 폼 -->
-        <form th:action="@{/fund/distribute/upload}"
+        <form th:action="@{/distribution/preview}"
               method="post"
               enctype="multipart/form-data"
               class="distribute-form">
@@ -104,7 +104,6 @@
             <div class="form-row">
                 <label class="form-label">네트워크 선택</label>
                 <select name="network" class="form-select">
-                    <option value="BEP20">BEP20(Binance Smart Chain)</option>
                     <option value="TRC20">TRC20(TRON)</option>
                     <!-- 필요 시 다른 네트워크 추가 -->
                 </select>
@@ -134,7 +133,7 @@
 
                 <!-- 파일양식 다운로드 버튼 -->
                 <div class="file-template">
-                    <a th:href="@{/fund/distribute/template}"
+                    <a th:href="@{/distribution/template}"
                        class="btn btn-link">
                         파일양식 다운로드
                     </a>
