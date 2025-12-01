@@ -14,9 +14,11 @@ public class DistributionEnvServiceImpl implements DistributionEnvService {
     @Value("${tron.wallet.main-address}")
     private String mainAddress;
 
-    @Value("${distribution.network-name:BEP20 (Binance Smart Chain)}")
+    // 기본 네트워크 문구를 TRC20 기준으로 변경
+    @Value("${distribution.network-name:TRC20 (TRON)}")
     private String networkName;
 
+    // 없으면 5로 들어감
     @Value("${distribution.gas-fee:5}")
     private BigDecimal gasFee;
 
@@ -27,7 +29,7 @@ public class DistributionEnvServiceImpl implements DistributionEnvService {
 
     @Override
     public BigDecimal getAvailable() {
-        // TronScan에서 현재 USDT 보유량 조회
+        // 이 부분은 기존에 /api/wallet/usdt-balance 에서 잘 돌아간 거랑 동일 로직
         double usdt = tronAssetService.getUsdtBalance(mainAddress);
         return BigDecimal.valueOf(usdt);
     }
