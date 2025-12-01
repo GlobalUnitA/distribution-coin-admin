@@ -24,7 +24,7 @@ public class DistributionPreviewRow {
         this.name = name;
     }
 
-    public String getWalletaddress(){
+    public String getWalletAddress(){
         return walletAddress;
     }
 
