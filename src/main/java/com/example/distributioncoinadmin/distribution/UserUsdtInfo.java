@@ -41,7 +41,7 @@ public class UserUsdtInfo {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+            updatable = false)
     private LocalDateTime updatedAt;
 
 

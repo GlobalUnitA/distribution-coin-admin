@@ -28,7 +28,7 @@ public class UsdtDistributionBatch {
     @Column(name = "progress",  nullable = false)
     private int progress = 0;
 
-    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
 
