@@ -1,6 +1,8 @@
 package com.example.distributioncoinadmin.distribution;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -28,6 +30,7 @@ public class UsdtDistributionBatch {
     @Column(name = "progress",  nullable = false)
     private int progress = 0;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
