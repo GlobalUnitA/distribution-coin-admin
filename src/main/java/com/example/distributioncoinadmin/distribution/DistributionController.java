@@ -74,4 +74,11 @@ public class DistributionController {
 
         return "distribution/preview";
     }
+
+    @PostMapping("/execute")
+    public String execute(){
+        log.info("분배 실행 버튼 클릭");
+
+        return "redirect:/distribution/upload";
+    }
 }
