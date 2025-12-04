@@ -2,6 +2,7 @@ package com.example.distributioncoinadmin.distribution;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,13 +38,13 @@ public class UserUsdtInfo {
     @Column(name = "amount", nullable = false, precision = 36, scale = 18)
     private BigDecimal amount;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+            updatable = false)
     private LocalDateTime createdAt;
 
-    @CreationTimestamp
-    @Column(name = "updated_at", nullable = false,
-            updatable = false)
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
 
