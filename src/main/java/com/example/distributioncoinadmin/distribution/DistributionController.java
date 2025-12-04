@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 public class DistributionController {
     private final DistributionPreviewService previewService;
     private final DistributionEnvService envService;
+    private final UsdtDistributionBatchRepository batchRepository;
+    private final UsdtDistributionItemRepository itemRepository;
+    private final DistributionExecutionService executionService;
 
     @GetMapping("/upload")
     public String showUploadForm(){
@@ -36,21 +39,39 @@ public class DistributionController {
             Model model
             ) throws IOException {
 
-        //1) 엑셀 파싱
+        // 1) 엑셀 파싱
         List<DistributionPreviewRow> rows = previewService.parseExcel(file);
         if(rows == null){
             rows = List.of();
         }
 
-        //2) 엑셀 출금수량 합계 계산
+        // 2) 엑셀 출금수량 합계 계산
         BigDecimal totalAmount = rows.stream()
                 .map(r -> r.getAmount() == null ? BigDecimal.ZERO : r.getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        model.addAttribute("coinSymbol", coinSymbol);
-        model.addAttribute("network", network);
+        // 3) 배치 저장 (로그용)
+        UsdtDistributionBatch batch = new UsdtDistributionBatch();
+        batch.setCoinSymbol(coinSymbol);
+        batch.setNetwork(network);
+        batch.setTotalAmount(totalAmount);
+        batch.setStatus(BatchStatus.READY);
+        batch.setProgress(0);
+        batchRepository.save(batch);
 
-        //3) 기존 서비스값을 Model에 넣기 (DTO 없이 개별 변수로 처리)
+        // 4) 아이템 로그 저장 (PENDING)
+        for(DistributionPreviewRow row : rows){
+            UsdtDistributionItem item = new UsdtDistributionItem();
+
+            item.setBatch(batch);
+            item.setName(row.getName());
+            item.setWalletAddress(row.getWalletAddress());
+            item.setAmount(row.getAmount());
+            item.setStatus(ItemStatus.PENDING);
+            itemRepository.save(item);
+        }
+
+        // 5) 기존 환경 정보
         String networkName = "N/A";
         BigDecimal available = BigDecimal.ZERO;
         BigDecimal gasFee = BigDecimal.ZERO;
@@ -64,21 +85,30 @@ public class DistributionController {
             // 일단 화면은 뜨게 기본값으로 둠
         }
 
+
+        // 6) Model에 값 세팅
+        model.addAttribute("coinSymbol", coinSymbol);
+        model.addAttribute("network", network);
         model.addAttribute("networkName", networkName);
         model.addAttribute("available", available);
         model.addAttribute("gasFee", gasFee);
-
-        // 4) 미리보기 값
         model.addAttribute("totalAmount", totalAmount);
         model.addAttribute("rows", rows);
+
+        //분배 실행용 batchId 내려줌
+        model.addAttribute("batchId", batch.getId());
 
         return "distribution/preview";
     }
 
     @PostMapping("/execute")
-    public String execute(){
-        log.info("분배 실행 버튼 클릭");
+    public String execute(@RequestParam("batchId") Long batchId){
+        log.info("분배 실행 버튼 클릭, batchId={}", batchId);
 
+        //비동기 분배 실행 시작
+        executionService.executeBatchAsync(batchId);
+
+        //TODO : 지금은 그냥 upload 페이지로 쏴주지만 필요할 경우 경로 변경.
         return "redirect:/distribution/upload";
     }
 }
