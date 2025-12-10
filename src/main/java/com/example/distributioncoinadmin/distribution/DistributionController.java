@@ -3,10 +3,7 @@ package com.example.distributioncoinadmin.distribution;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -102,6 +99,7 @@ public class DistributionController {
     }
 
     @PostMapping("/execute")
+    @ResponseBody
     public String execute(@RequestParam("batchId") Long batchId){
         log.info("분배 실행 버튼 클릭, batchId={}", batchId);
 
@@ -109,6 +107,6 @@ public class DistributionController {
         executionService.executeBatchAsync(batchId);
 
         //TODO : 지금은 그냥 upload 페이지로 쏴주지만 필요할 경우 경로 변경.
-        return "redirect:/distribution/upload";
+        return "OK";
     }
 }

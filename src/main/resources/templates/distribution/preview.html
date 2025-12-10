@@ -44,13 +44,87 @@
             </tbody>
         </table>
 
-        <form th:action="@{/distribution/execute}" method="post">
-            <input type="hidden" name="batchId" th:value="${batchId}">
-            <button type="submit">분배 실행</button>
+        <form id="executeForm">
+            <input type="hidden" id="batchId" name="batchId" th:value="${batchId}">
+            <button type="button" onclick="startDistribution()">분배 실행</button>
         </form>
 
     </div>
+
+    <div style="margin-top: 20px;">
+        <div>
+            진행률:
+            <span id="progressText">대기 중</span>
+        </div>
+
+        <div style="width: 300px; height: 20px; border: 1px solid #ccc; margin-top: 5px;">
+            <div id="progressBar"
+                 style="height: 100%; width: 0%; background-color: #4caf50;"></div>
+        </div>
+
+        <div style="margin-top: 5px;">
+            상태: <span id="batchStatus">READY</span>
+        </div>
+    </div>
+
 </div>
+
+<script type="text/javascript">
+    function startDistribution() {
+        const batchId = document.getElementById("batchId").value;
+
+        fetch('distribution/execute',
+            {
+                method : 'POST',
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body : 'batchId=' + encodeURIComponent(batchId)
+            }).then(function (response){
+                if(!response.ok){
+                    throw new Error('execute failed');
+                }
+
+                startPolling(batchId);
+        }).catch(function (error) {
+            console.error('execute error',error);
+            alert('분배 실행 시작중 오류가 발생했습니다.');
+        });
+    }
+
+    function startPolling(batchId) {
+        const progressText = document.getElementById("progressText");
+        const progressBar = document.getElementById("progressBar");
+        const statusSpan = document.getElementById("batchStatus");
+
+        progressText.textContent = "0%";
+        statusSpan.textContent = "PROCESSING";
+
+        const intervalId = setInterval(function () {
+            fetch('/api/distribution/progress?batchId=' + encodeURIComponent(batchId)).then (function (response) {
+                if(!response.ok){
+                    throw new Error('progress failed');
+                }
+                return response.json();
+            }).then(function (data) {
+                const progress = data.progress;
+                const status = data.status;
+
+                progressText.textContent = progress + "%";
+                progressBar.style.width = progress + "%";
+                statusSpan.textContent = status;
+
+                if(status == "DONE" || status == "FAILED"){
+                    clearInterval(intervalId);
+                    //TODO : 필요하면 결과 화면으로 이동 처리
+                    // location.href = '/distribution/result?batchId=' + batchId
+                }
+            }).catch(function (error) {
+                console.error('progress error', error);
+            });
+        }, 2000); //2초마다 폴링
+    }
+</script>
 
 </body>
 </html>
