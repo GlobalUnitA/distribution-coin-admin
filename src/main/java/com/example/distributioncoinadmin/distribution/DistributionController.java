@@ -68,7 +68,40 @@ public class DistributionController {
             itemRepository.save(item);
         }
 
-        // 5) 기존 환경 정보
+        return "redirect:/distribution/preview?batchId=" + batch.getId();
+    }
+
+    @PostMapping("/execute")
+    @ResponseBody
+    public String execute(@RequestParam("batchId") Long batchId){
+        log.info("분배 실행 버튼 클릭, batchId={}", batchId);
+
+        //비동기 분배 실행 시작
+        executionService.executeBatchAsync(batchId);
+
+        //TODO : 지금은 그냥 upload 페이지로 쏴주지만 필요할 경우 경로 변경.
+        return "OK";
+    }
+
+    @GetMapping("/preview")
+    public String showPreview(
+        @RequestParam("batchId") Long batchId,
+        Model model
+    ) {
+        //배치 아이템 조회
+        UsdtDistributionBatch batch = batchRepository.findById(batchId).orElseThrow(() -> new IllegalArgumentException("batch not found : " + batchId));
+        List<UsdtDistributionItem> items = itemRepository.findByBatchId(batchId);
+
+        //기존 템플릿이 rows(List<DistributionPreviewRow>)를 쓰고 있다면 변환
+        List<DistributionPreviewRow> rows = items.stream().map(item -> {
+            DistributionPreviewRow r = new DistributionPreviewRow();
+            r.setName(item.getName());
+            r.setWalletAddress(item.getWalletAddress());
+            r.setAmount(item.getAmount());
+            return r;
+        }).toList();
+
+        // 기존 환경 정보
         String networkName = "N/A";
         BigDecimal available = BigDecimal.ZERO;
         BigDecimal gasFee = BigDecimal.ZERO;
@@ -82,31 +115,18 @@ public class DistributionController {
             // 일단 화면은 뜨게 기본값으로 둠
         }
 
-
-        // 6) Model에 값 세팅
-        model.addAttribute("coinSymbol", coinSymbol);
-        model.addAttribute("network", network);
+        // Model에 값 세팅
+        model.addAttribute("coinSymbol", batch.getCoinSymbol());
+        model.addAttribute("network", batch.getNetwork());
         model.addAttribute("networkName", networkName);
         model.addAttribute("available", available);
         model.addAttribute("gasFee", gasFee);
-        model.addAttribute("totalAmount", totalAmount);
+        model.addAttribute("totalAmount", batch.getTotalAmount());
         model.addAttribute("rows", rows);
 
         //분배 실행용 batchId 내려줌
-        model.addAttribute("batchId", batch.getId());
+        model.addAttribute("batchId", batchId);
 
         return "distribution/preview";
-    }
-
-    @PostMapping("/execute")
-    @ResponseBody
-    public String execute(@RequestParam("batchId") Long batchId){
-        log.info("분배 실행 버튼 클릭, batchId={}", batchId);
-
-        //비동기 분배 실행 시작
-        executionService.executeBatchAsync(batchId);
-
-        //TODO : 지금은 그냥 upload 페이지로 쏴주지만 필요할 경우 경로 변경.
-        return "OK";
     }
 }
