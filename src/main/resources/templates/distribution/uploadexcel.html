@@ -156,6 +156,10 @@
         </form>
     </div>
 
+    <div th:if="${errorMessage}" style="color: red; margin-top: 10px;">
+        <strong th:text="${errorMessage}"></strong>
+    </div>
+
 </div>
 
 <script>

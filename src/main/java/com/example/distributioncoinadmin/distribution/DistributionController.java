@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,29 @@ public class DistributionController {
         BigDecimal totalAmount = rows.stream()
                 .map(r -> r.getAmount() == null ? BigDecimal.ZERO : r.getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        //2.5) 사용 가능 수량과 출금 수량 검증
+        BigDecimal available = BigDecimal.ZERO;
+        try {
+            available = envService.getAvailable();
+        } catch(Exception e){
+            log.error("사용가능 수량 조회 실패",e);
+            model.addAttribute("errorMessage","사용가능 수량 조회에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            return "distribution/uploadexcel";
+        }
+
+        if(totalAmount.compareTo(available) > 0){
+            model.addAttribute("errorMessage",
+                    "출금수량 합계(" + totalAmount + ")가 사용가능 수량(" + available + ")을 초과했습니다.");
+
+            model.addAttribute("coinSymbol", coinSymbol);
+            model.addAttribute("network", network);
+            model.addAttribute("available", available);
+            model.addAttribute("totalAmount", totalAmount);
+
+            return "distribution/uploadexcel";
+        }
+
 
         // 3) 배치 저장 (로그용)
         UsdtDistributionBatch batch = new UsdtDistributionBatch();
